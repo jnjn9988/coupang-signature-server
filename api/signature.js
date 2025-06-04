@@ -1,5 +1,4 @@
 // api/signature.js
-
 import crypto from 'crypto';
 
 export const config = {
@@ -20,7 +19,8 @@ export default function handler(req, res) {
   }
 
   try {
-    const message = `${timestamp}${method}${path}`;
+    const message = `CEA algorithm=HmacSHA256, access-key=${accessKey}, signed-date=${timestamp}`;
+
     const signature = crypto
       .createHmac('sha256', secretKey)
       .update(message)
