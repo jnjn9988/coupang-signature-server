@@ -11,13 +11,16 @@ export default function handler(req, res) {
     return res.status(405).json({ error: 'Only POST allowed' });
   }
 
-  const { message, secretKey } = req.body;
+  const { method, path, timestamp, accessKey, secretKey } = req.body;
 
-  if (!secretKey || !message) {
-    return res.status(400).json({ error: 'Missing message or secretKey' });
+  if (!secretKey || typeof secretKey !== 'string') {
+    return res.status(400).json({ error: 'Missing or invalid secretKey' });
   }
 
   try {
+    // ✨ 올바른 메시지 형식
+    const message = `${timestamp}${method}${path}`;
+
     const signature = crypto
       .createHmac('sha256', secretKey)
       .update(message)
