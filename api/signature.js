@@ -1,4 +1,3 @@
-// api/signature.js
 import crypto from 'crypto';
 
 export const config = {
@@ -12,16 +11,13 @@ export default function handler(req, res) {
     return res.status(405).json({ error: 'Only POST allowed' });
   }
 
-  const { method, path, timestamp, accessKey, secretKey } = req.body;
+  const { message, secretKey } = req.body;
 
-  if (!secretKey || typeof secretKey !== 'string') {
-    return res.status(400).json({ error: 'Missing or invalid secretKey' });
+  if (!secretKey || !message) {
+    return res.status(400).json({ error: 'Missing message or secretKey' });
   }
 
   try {
-    // ✅ 쿠팡 요구 사항에 맞는 message 포맷
-    const message = `${timestamp}\n${method}\n${path}\n`;
-
     const signature = crypto
       .createHmac('sha256', secretKey)
       .update(message)
