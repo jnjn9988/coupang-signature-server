@@ -1,13 +1,33 @@
-import crypto from "crypto";
+// api/signature.js
+
+import crypto from 'crypto';
+
+export const config = {
+  api: {
+    bodyParser: true,
+  },
+};
 
 export default function handler(req, res) {
-  const { method, path, timestamp, accessKey, secretKey } = req.query;
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Only POST allowed' });
+  }
 
-  const message = `${timestamp}${method}${path}`;
-  const signature = crypto
-    .createHmac("sha256", secretKey)
-    .update(message)
-    .digest("base64");
+  const { method, path, timestamp, accessKey, secretKey } = req.body;
 
-  res.status(200).json({ signature });
+  if (!secretKey || typeof secretKey !== 'string') {
+    return res.status(400).json({ error: 'Missing or invalid secretKey' });
+  }
+
+  try {
+    const message = `${timestamp}${method}${path}`;
+    const signature = crypto
+      .createHmac('sha256', secretKey)
+      .update(message)
+      .digest('base64');
+
+    return res.status(200).json({ signature });
+  } catch (e) {
+    return res.status(500).json({ error: e.message });
+  }
 }
