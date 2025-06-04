@@ -19,7 +19,8 @@ export default function handler(req, res) {
   }
 
   try {
-    const message = `CEA algorithm=HmacSHA256, access-key=${accessKey}, signed-date=${timestamp}`;
+    // ✅ 쿠팡 요구 사항에 맞는 message 포맷
+    const message = `${timestamp}\n${method}\n${path}\n`;
 
     const signature = crypto
       .createHmac('sha256', secretKey)
