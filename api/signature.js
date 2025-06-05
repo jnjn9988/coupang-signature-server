@@ -7,15 +7,11 @@ export default function handler(req, res) {
 
   const { method, path, accessKey, secretKey, timestamp } = req.body;
 
-  if (!method || !path || !accessKey || !secretKey || !timestamp) {
-    return res.status(400).json({ error: 'Missing required parameters' });
-  }
+  // 🚨 path는 반드시 쿼리스트링 제거해야 함
+  const cleanPath = path.split('?')[0];
+  const message = timestamp + method.toUpperCase() + cleanPath;
 
-  // 쿠팡 요구사항: message = signedDate + method + path (query string 없이)
-  const parsedPath = path.split('?')[0];
-  const message = timestamp + method.toUpperCase() + parsedPath;
-
-  // signature: Base64 인코딩된 HMAC SHA256
+  // ✅ HMAC SHA256 + Base64 인코딩
   const signature = crypto
     .createHmac('sha256', secretKey)
     .update(message)
