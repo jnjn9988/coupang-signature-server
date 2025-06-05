@@ -18,7 +18,7 @@ export default function handler(req, res) {
   }
 
   try {
-    // ✅ 쿠팡 공식 시그니처 포맷
+    // ✅ 쿠팡 공식 메시지 포맷
     const message = `${method}\n${path}\n${timestamp}\n${accessKey}`;
 
     const signature = crypto
