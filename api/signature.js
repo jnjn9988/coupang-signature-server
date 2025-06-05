@@ -18,8 +18,8 @@ export default function handler(req, res) {
   }
 
   try {
-    // ✅ 쿠팡 표준 메시지 포맷
-    const message = `${method} ${path}\n${timestamp}\n${accessKey}`;
+    // ✅ 쿠팡 공식 시그니처 포맷
+    const message = `n${method}\n${path}\n${timestamp}\n${accessKey}`;
 
     const signature = crypto
       .createHmac('sha256', secretKey)
