@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+/*import crypto from 'crypto';
 
 export const config = {
   api: {
@@ -30,4 +30,23 @@ export default function handler(req, res) {
   } catch (e) {
     return res.status(500).json({ error: e.message });
   }
+}
+*/
+
+// /api/signature.js
+import crypto from 'crypto';
+
+export default function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Only POST allowed' });
+  }
+
+  const { method, path, accessKey, secretKey, timestamp } = req.body;
+
+  const message = `${timestamp}${method}${path}`;
+  const signature = crypto.createHmac('sha256', secretKey)
+    .update(message)
+    .digest('base64');
+
+  res.status(200).json({ signature });
 }
