@@ -5,13 +5,22 @@ export default function handler(req, res) {
     return res.status(405).json({ error: 'Only POST allowed' });
   }
 
-  const { method, path, accessKey, secretKey, timestamp } = req.body;
+  const { method, path, accessKey, secretKey } = req.body;
 
-  // 🚨 path는 반드시 쿼리스트링 제거해야 함
+  const now = new Date();
+  const pad = (n) => n.toString().padStart(2, '0');
+  const timestamp = now.getUTCFullYear().toString()
+    + pad(now.getUTCMonth() + 1)
+    + pad(now.getUTCDate())
+    + 'T'
+    + pad(now.getUTCHours())
+    + pad(now.getUTCMinutes())
+    + pad(now.getUTCSeconds())
+    + 'Z';
+
   const cleanPath = path.split('?')[0];
   const message = timestamp + method.toUpperCase() + cleanPath;
 
-  // ✅ HMAC SHA256 + Base64 인코딩
   const signature = crypto
     .createHmac('sha256', secretKey)
     .update(message)
@@ -19,5 +28,5 @@ export default function handler(req, res) {
 
   const authorization = `CEA algorithm=HmacSHA256, access-key=${accessKey}, signed-date=${timestamp}, signature=${signature}`;
 
-  res.status(200).json({ signature, authorization });
+  res.status(200).json({ timestamp, signature, authorization });
 }
